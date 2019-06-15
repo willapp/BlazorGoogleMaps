@@ -66,7 +66,7 @@ namespace GoogleMapsComponents
                     }
                     else if (arg is Action action)
                     {
-                        return new DotNetObjectRef(
+                        return DotNetObjectRef.Create(
                             new JsCallableAction(jsRuntime, action));
                     }
                     else if (argType.IsGenericType
@@ -76,11 +76,11 @@ namespace GoogleMapsComponents
 
                         //Debug.WriteLine($"Generic args : {genericArguments.Count()}");
 
-                        return new DotNetObjectRef(new JsCallableAction(jsRuntime, (Delegate)arg, genericArguments));
+                        return DotNetObjectRef.Create(new JsCallableAction(jsRuntime, (Delegate)arg, genericArguments));
                     }
                     else if (arg is JsCallableAction)
                     {
-                        return new DotNetObjectRef(arg);
+                        return DotNetObjectRef.Create(arg);
                     }
                     else if (arg is IJsObjectRef jsObjectRef)
                     {
