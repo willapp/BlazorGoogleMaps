@@ -1,37 +1,47 @@
-﻿using OneOf;
+﻿using Microsoft.JSInterop;
+using OneOf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GoogleMapsComponents.Maps.Data
+namespace GoogleMapsComponents.Maps.TheData
 {
     /// <summary>
     /// A feature has a geometry, an id, and a set of properties
     /// </summary>
-    public class Feature : IEnumerable<string>
+    public class Feature
     {
+        private readonly JsObjectRef _jsObjectRef;
+
         /// <summary>
         /// Constructs a Feature with the given options.
         /// </summary>
         /// <param name="options"></param>
-        public Feature(FeatureOptions options = null)
+        public async static Task<Feature> CreateAsync(IJSRuntime jsRuntime, FeatureOptions options = null)
         {
-            throw new NotImplementedException();
-        }
+            var jsObjectRef = await JsObjectRef.CreateAsync(jsRuntime, "google.maps.Data.Feature", options);
+            var obj = new Feature(jsObjectRef);
 
-        public IEnumerable<KeyValuePair<string, object>> Properties { get; private set; }
+            return obj;
+        }
 
         /// <summary>
-        /// Repeatedly invokes the given function, passing a property value and name on each invocation. 
-        /// The order of iteration through the properties is undefined.
+        /// Constructs a Feature with the given options.
         /// </summary>
-        /// <returns></returns>
-        public IEnumerator<string> GetEnumerator()
+        /// <param name="options"></param>
+        //private Feature(JsObjectRefFeatureOptions options = null)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        internal Feature(JsObjectRef jsObjectRef)
         {
-            throw new NotImplementedException();
+            _jsObjectRef = jsObjectRef;
         }
+
+        //public IEnumerable<KeyValuePair<string, object>> Properties { get; private set; }
 
         /// <summary>
         /// Returns the feature's geometry.
@@ -46,7 +56,7 @@ namespace GoogleMapsComponents.Maps.Data
         /// Returns the feature ID.
         /// </summary>
         /// <returns></returns>
-        public OneOf<int, string> GetId()
+        public OneOf<int, string>? GetId()
         {
             throw new NotImplementedException();
         }
@@ -99,9 +109,9 @@ namespace GoogleMapsComponents.Maps.Data
             throw new NotImplementedException();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

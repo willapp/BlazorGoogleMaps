@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GoogleMapsComponents.Maps.Data
+namespace GoogleMapsComponents.Maps.TheData
 {
     /// <summary>
     /// DataOptions object used to define the properties that a developer can set on a Data object.

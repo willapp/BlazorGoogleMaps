@@ -23,5 +23,10 @@ namespace GoogleMapsComponents
         {
             return _instances[guid];
         }
+
+        internal static T GetInstance<T>(string guid)
+        {
+            return (T)_instances[guid];
+        }
     }
 }

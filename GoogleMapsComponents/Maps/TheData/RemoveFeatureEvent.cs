@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GoogleMapsComponents.Maps.Data
+namespace GoogleMapsComponents.Maps.TheData
 {
     /// <summary>
-    /// google.maps.Data.AddFeatureEvent interface 
+    /// google.maps.Data.RemoveFeatureEvent interface 
     /// </summary>
-    public class AddFeatureEvent
+    public class RemoveFeatureEvent
     {
         /// <summary>
-        /// The feature that was added to the FeatureCollection.
+        /// The feature that was removed from the FeatureCollection.
         /// </summary>
         public Feature Feature { get; set; }
     }

@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GoogleMapsComponents.Maps.Data
+namespace GoogleMapsComponents.Maps.TheData
 {
     /// <summary>
-    /// A LinearRing geometry contains a number of LatLngs, representing a closed LineString. 
-    /// There is no need to make the first LatLng equal to the last LatLng. 
-    /// The LinearRing is closed implicitly.
+    /// A MultiLineString geometry contains a number of LineString s.
     /// </summary>
-    public class LineString : Geometry
+    public class MultiPoint : Geometry
     {
         private readonly IEnumerable<LatLngLiteral> _elements;
 
-        public LineString(IEnumerable<LatLngLiteral> elements)
+        public MultiPoint(IEnumerable<LatLngLiteral> elements)
         {
             _elements = elements;
         }
@@ -24,6 +22,11 @@ namespace GoogleMapsComponents.Maps.Data
             return _elements.GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns an array of the contained LatLngs. 
+        /// A new array is returned each time getArray() is called.
+        /// </summary>
+        /// <returns></returns>
         public List<LatLngLiteral> GetArray()
         {
             return _elements.ToList();

@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GoogleMapsComponents.Maps.TheData;
 using Microsoft.JSInterop;
 using OneOf;
 
@@ -13,7 +15,7 @@ namespace GoogleMapsComponents.Maps
     /// Every Map has a Data object by default, so most of the time there is no need to construct one.
     /// The Data object is a collection of Features.
     /// </summary>
-    public class MapData : IEnumerable<Maps.Data.Feature>, IDisposable
+    public class Data : /*IEnumerable<Feature>,*/ IDisposable
     {
         private readonly JsObjectRef _jsObjectRef;
         private Map _map;
@@ -22,11 +24,11 @@ namespace GoogleMapsComponents.Maps
         /// Creates an empty collection, with the given DataOptions.
         /// </summary>
         /// <param name="options"></param>
-        public async static Task<MapData> CreateAsync(IJSRuntime jsRuntime, Data.DataOptions opts = null)
+        public async static Task<Data> CreateAsync(IJSRuntime jsRuntime, DataOptions opts = null)
         {
             var jsObjectRef = await JsObjectRef.CreateAsync(jsRuntime, "google.maps.Data", opts);
 
-            var obj = new MapData(jsObjectRef);
+            var obj = new Data(jsObjectRef);
 
             return obj;
         }
@@ -34,7 +36,7 @@ namespace GoogleMapsComponents.Maps
         /// <summary>
         /// Creates an empty collection, with the given DataOptions.
         /// </summary>
-        internal MapData(JsObjectRef jsObjectRef)
+        internal Data(JsObjectRef jsObjectRef)
         {
             _jsObjectRef = jsObjectRef;
         }
@@ -44,14 +46,24 @@ namespace GoogleMapsComponents.Maps
             _jsObjectRef.Dispose();
         }
 
-        public IEnumerator<Data.Feature> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        //public IEnumerator<Feature> GetEnumerator()
+        //{
+        //    return ForEach().Result.GetEnumerator();
+        //}
 
-        IEnumerator IEnumerable.GetEnumerator()
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    return GetEnumerator();
+        //}
+
+        public async Task<IObservable<Feature>> ForEach()
         {
-            return GetEnumerator();
+            var observable = Observable.FromEvent<Feature>(_ => { }, _ => { });
+
+            Action<Feature> handler = feature => { observable.Publish(feature); };
+            await _jsObjectRef.InvokeAsync("forEach", handler);
+
+            return observable;
         }
 
         /// <summary>
@@ -61,9 +73,9 @@ namespace GoogleMapsComponents.Maps
         /// </summary>
         /// <param name="feature"></param>
         /// <returns></returns>
-        public Task<Data.Feature> Add(OneOf<Data.Feature, Data.FeatureOptions> feature)
+        public Task<Feature> Add(OneOf<Feature, FeatureOptions> feature)
         {
-            return _jsObjectRef.InvokeAsync<Data.Feature>(
+            return _jsObjectRef.InvokeAsync<Feature>(
                 "add",
                 feature);
         }
@@ -75,9 +87,14 @@ namespace GoogleMapsComponents.Maps
         /// <param name="geoJson"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public Task<IEnumerable<Data.Feature>> AddGeoJson(object geoJson, Maps.Data.GeoJsonOptions options = null)
+        public async Task<Feature[]> AddGeoJson(object geoJson, GeoJsonOptions options = null)
         {
-            throw new NotImplementedException();
+            var result = await _jsObjectRef.InvokeWithReturnedObjectRefArrayAsync(
+                "addGeoJson",
+                geoJson,
+                options);
+
+            return result.Select(r => new Feature(r)).ToArray();
         }
 
         /// <summary>
@@ -85,7 +102,7 @@ namespace GoogleMapsComponents.Maps
         /// </summary>
         /// <param name="feature"></param>
         /// <returns></returns>
-        public Task<bool> Contains(Data.Feature feature)
+        public Task<bool> Contains(Feature feature)
         {
             return _jsObjectRef.InvokeAsync<bool>(
                 "contains",
@@ -131,9 +148,9 @@ namespace GoogleMapsComponents.Maps
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<Data.Feature> GetFeatureById(OneOf<int, string> id)
+        public Task<Feature> GetFeatureById(OneOf<int, string> id)
         {
-            return _jsObjectRef.InvokeAsync<Data.Feature>(
+            return _jsObjectRef.InvokeAsync<Feature>(
                 "getFeatureById",
                 id.Value);
         }
@@ -151,7 +168,7 @@ namespace GoogleMapsComponents.Maps
         /// Gets the style for all features in the collection.
         /// </summary>
         /// <returns></returns>
-        public Task<OneOf<Func<Data.Feature, Data.StyleOptions>, Data.StyleOptions>> GetStyle()
+        public Task<OneOf<Func<Feature, StyleOptions>, StyleOptions>> GetStyle()
         {
             //return Helper.InvokeWithDefinedGuidAndMethodAsync<Data.Feature>(
             //    "googleMapDataJsFunctions.invoke",
@@ -168,7 +185,7 @@ namespace GoogleMapsComponents.Maps
         /// <param name="url"></param>
         /// <param name="otpions"></param>
         /// <returns></returns>
-        public Task<Data.Feature> LoadGeoJson(string url, Data.GeoJsonOptions otpions = null)
+        public Task<Feature> LoadGeoJson(string url, GeoJsonOptions otpions = null)
         {
             throw new NotImplementedException();
         }
@@ -180,7 +197,7 @@ namespace GoogleMapsComponents.Maps
         /// <param name="feature"></param>
         /// <param name="style"></param>
         /// <returns></returns>
-        public Task OverrideSytle(Data.Feature feature, Data.StyleOptions style)
+        public Task OverrideSytle(Feature feature, StyleOptions style)
         {
             return _jsObjectRef.InvokeAsync(
                 "overrideSytle",
@@ -193,7 +210,7 @@ namespace GoogleMapsComponents.Maps
         /// </summary>
         /// <param name="feature"></param>
         /// <returns></returns>
-        public Task Remove(Data.Feature feature)
+        public Task Remove(Feature feature)
         {
             return _jsObjectRef.InvokeAsync(
                 "remove",
@@ -206,7 +223,7 @@ namespace GoogleMapsComponents.Maps
         /// </summary>
         /// <param name="feature"></param>
         /// <returns></returns>
-        public Task RevertStyle(Data.Feature feature = null)
+        public Task RevertStyle(Feature feature = null)
         {
             return _jsObjectRef.InvokeAsync(
                 "revertStyle",
@@ -277,7 +294,7 @@ namespace GoogleMapsComponents.Maps
         /// </summary>
         /// <param name="style"></param>
         /// <returns></returns>
-        public Task SetStyle(OneOf<Func<Data.Feature, Data.StyleOptions>, Data.StyleOptions> style)
+        public Task SetStyle(OneOf<Func<Feature, StyleOptions>, StyleOptions> style)
         {
             throw new NotImplementedException();
         }

@@ -180,6 +180,17 @@ namespace GoogleMapsComponents
             return new JsObjectRef(_jsRuntime, new Guid(guid));
         }
 
+        public async Task<JsObjectRef[]> InvokeWithReturnedObjectRefArrayAsync(string functionName, params object[] args)
+        {
+            var guids = await _jsRuntime.MyInvokeAsync<string[]>(
+                "googleMapsObjectManager.invokeWithReturnedObjectRefArray",
+                new object[] { _guid.ToString(), functionName }
+                    .Concat(args).ToArray()
+            );
+
+            return guids.Select(guid => new JsObjectRef(_jsRuntime, new Guid(guid))).ToArray();
+        }
+
         public Task<T> GetValue<T>(string propertyName)
         {
             return _jsRuntime.MyInvokeAsync<T>(

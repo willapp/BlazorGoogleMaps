@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using OneOf;
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -95,13 +96,13 @@ namespace GoogleMapsComponents
                     }
                 });
 
-            if (typeof(IJsObjectRef).IsAssignableFrom(typeof(TRes)))
-            {
-                var guid = await jsRuntime.InvokeAsync<string>(identifier, jsFriendlyArgs);
+            //if (typeof(IJsObjectRef).IsAssignableFrom(typeof(TRes)))
+            //{
+            //    var guid = await jsRuntime.InvokeAsync<string>(identifier, jsFriendlyArgs);
 
-                return (TRes)JsObjectRefInstances.GetInstance(guid);
-            }
-            else if (typeof(IOneOf).IsAssignableFrom(typeof(TRes)))
+            //    return (TRes)JsObjectRefInstances.GetInstance(guid);
+            //}
+            if (typeof(IOneOf).IsAssignableFrom(typeof(TRes)))
             {
                 var resultObject = await jsRuntime.InvokeAsync<string>(identifier, jsFriendlyArgs);
                 object result = null;

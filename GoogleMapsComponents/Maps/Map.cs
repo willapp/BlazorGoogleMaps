@@ -22,7 +22,7 @@ namespace GoogleMapsComponents.Maps
 
         public Dictionary<ControlPosition, List<ElementRef>> Controls { get; private set; }
 
-        public MapData Data { get; private set; }
+        public Data Data { get; private set; }
 
         public static async Task<Map> CreateAsync(
             IJSRuntime jsRuntime, 
@@ -31,7 +31,7 @@ namespace GoogleMapsComponents.Maps
         {
             var jsObjectRef = await JsObjectRef.CreateAsync(jsRuntime, "google.maps.Map", mapDiv, opts);
             var dataObjectRef = await jsObjectRef.GetObjectReference("data");
-            var data = new MapData(dataObjectRef);
+            var data = new Data(dataObjectRef);
             var map = new Map(jsObjectRef, data);
 
             JsObjectRefInstances.Add(map);
@@ -39,7 +39,7 @@ namespace GoogleMapsComponents.Maps
             return map;
         }
 
-        private Map(JsObjectRef jsObjectRef, MapData data)
+        private Map(JsObjectRef jsObjectRef, Data data)
         {
             _jsObjectRef = jsObjectRef;
             Data = data;
