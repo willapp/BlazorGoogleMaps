@@ -15,10 +15,9 @@ namespace GoogleMapsComponents.Maps
     /// Every Map has a Data object by default, so most of the time there is no need to construct one.
     /// The Data object is a collection of Features.
     /// </summary>
-    public class Data : /*IEnumerable<Feature>,*/ IDisposable
+    public class Data : JsObjectRefBase
     {
-        private readonly JsObjectRef _jsObjectRef;
-        private Map _map;
+        //private Map _map;
 
         /// <summary>
         /// Creates an empty collection, with the given DataOptions.
@@ -37,13 +36,8 @@ namespace GoogleMapsComponents.Maps
         /// Creates an empty collection, with the given DataOptions.
         /// </summary>
         internal Data(JsObjectRef jsObjectRef)
+            : base(jsObjectRef)
         {
-            _jsObjectRef = jsObjectRef;
-        }
-
-        public void Dispose()
-        {
-            _jsObjectRef.Dispose();
         }
 
         //public IEnumerator<Feature> GetEnumerator()
@@ -61,7 +55,7 @@ namespace GoogleMapsComponents.Maps
             var observable = Observable.FromEvent<Feature>(_ => { }, _ => { });
 
             Action<Feature> handler = feature => { observable.Publish(feature); };
-            await _jsObjectRef.InvokeAsync("forEach", handler);
+            await InvokeAsync("forEach", handler);
 
             return observable;
         }
@@ -75,7 +69,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<Feature> Add(OneOf<Feature, FeatureOptions> feature)
         {
-            return _jsObjectRef.InvokeAsync<Feature>(
+            return InvokeAsync<Feature>(
                 "add",
                 feature);
         }
@@ -89,7 +83,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public async Task<Feature[]> AddGeoJson(object geoJson, GeoJsonOptions options = null)
         {
-            var result = await _jsObjectRef.InvokeWithReturnedObjectRefArrayAsync(
+            var result = await InvokeWithReturnedObjectRefArrayAsync(
                 "addGeoJson",
                 geoJson,
                 options);
@@ -104,7 +98,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<bool> Contains(Feature feature)
         {
-            return _jsObjectRef.InvokeAsync<bool>(
+            return InvokeAsync<bool>(
                 "contains",
                 feature);
         }
@@ -115,7 +109,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<ControlPosition> GetControlPosition()
         {
-            return _jsObjectRef.InvokeAsync<ControlPosition>(
+            return InvokeAsync<ControlPosition>(
                 "getControlPosition");
         }
 
@@ -127,7 +121,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<IEnumerable<string>> GetControls()
         {
-            return _jsObjectRef.InvokeAsync<IEnumerable<string>>(
+            return InvokeAsync<IEnumerable<string>>(
                 "getControls");
         }
 
@@ -138,7 +132,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<string> GetDrawingMode()
         {
-            return _jsObjectRef.InvokeAsync<string>(
+            return InvokeAsync<string>(
                 "getDrawingMode");
         }
 
@@ -150,7 +144,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<Feature> GetFeatureById(OneOf<int, string> id)
         {
-            return _jsObjectRef.InvokeAsync<Feature>(
+            return InvokeAsync<Feature>(
                 "getFeatureById",
                 id.Value);
         }
@@ -159,9 +153,9 @@ namespace GoogleMapsComponents.Maps
         /// Returns the map on which the features are displayed.
         /// </summary>
         /// <returns></returns>
-        public Map GetMap()
+        public Task<Map> GetMap()
         {
-            return _map;
+            return InvokeAsync<Map>("getMap");
         }
 
         /// <summary>
@@ -185,9 +179,13 @@ namespace GoogleMapsComponents.Maps
         /// <param name="url"></param>
         /// <param name="otpions"></param>
         /// <returns></returns>
-        public Task<Feature> LoadGeoJson(string url, GeoJsonOptions otpions = null)
+        public Task LoadGeoJson(string url, GeoJsonOptions options = null, Action<Feature[]> callback = null)
         {
-            throw new NotImplementedException();
+            return InvokeAsync(
+                "loadGeoJson",
+                url,
+                options,
+                callback);
         }
 
         /// <summary>
@@ -199,7 +197,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task OverrideSytle(Feature feature, StyleOptions style)
         {
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "overrideSytle",
                 feature,
                 style);
@@ -212,7 +210,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task Remove(Feature feature)
         {
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "remove",
                 feature);
         }
@@ -225,7 +223,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task RevertStyle(Feature feature = null)
         {
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "revertStyle",
                 feature);
         }
@@ -237,7 +235,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task SetControlPosition(ControlPosition controlPosition)
         {
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "setControlPosition",
                 controlPosition);
         }
@@ -252,7 +250,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task SetControls(IEnumerable<string> controls)
         {
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "setControls",
                 controls);
         }
@@ -266,7 +264,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task SetDrawingMode(string drawingMode)
         {
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "setDrawingMode",
                 drawingMode);
         }
@@ -279,9 +277,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task SetMap(Map map)
         {
-            _map = map;
-
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "setMap",
                 map);
         }
@@ -310,7 +306,7 @@ namespace GoogleMapsComponents.Maps
 
         public async Task<MapEventListener> AddListener(string eventName, Action handler)
         {
-            var listenerRef = await _jsObjectRef.InvokeWithReturnedObjectRefAsync(
+            var listenerRef = await InvokeWithReturnedObjectRefAsync(
                 "addListener", eventName, handler);
 
             return new MapEventListener(listenerRef);
@@ -318,7 +314,7 @@ namespace GoogleMapsComponents.Maps
 
         public async Task<MapEventListener> AddListener<T>(string eventName, Action<T> handler)
         {
-            var listenerRef = await _jsObjectRef.InvokeWithReturnedObjectRefAsync(
+            var listenerRef = await InvokeWithReturnedObjectRefAsync(
                 "addListener", eventName, handler);
 
             return new MapEventListener(listenerRef);

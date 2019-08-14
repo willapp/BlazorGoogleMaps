@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace GoogleMapsComponents
 {
@@ -22,22 +23,22 @@ namespace GoogleMapsComponents
         }
 
         [JSInvokable]
-        public void Invoke(string args, string guid)
+        public void Invoke(string[] guids)
         {
-            if (string.IsNullOrWhiteSpace(args) || !_argumentTypes.Any())
+            //Debug.WriteLine($"Invoke GUID count : {guids.Length}");
+
+            if (guids == null || !guids.Any() || !_argumentTypes.Any())
             {
                 _delegate.DynamicInvoke();
                 return;
             }
 
-            var jArray = JArray.Parse(args);
-            var arguments = _argumentTypes.Zip(jArray, (type, jToken) => new { jToken, type })
+            //var jArray = JArray.Parse(args);
+            var arguments = _argumentTypes.Zip(guids, (type, guid) => new { guid, type })
                 .Select(x =>
                 {
-                    var obj = x.jToken.ToObject(x.type);
-
-                    if (obj is IActionArgument actionArg)
-                        actionArg.JsObjectRef = new JsObjectRef(_jsRuntime, new Guid(guid));
+                    var ctor = x.type.GetConstructor(new[] { typeof(JsObjectRef) });
+                    var obj = ctor.Invoke(new object[] { new JsObjectRef(_jsRuntime, new Guid(x.guid)) });
 
                     return obj;
                 })

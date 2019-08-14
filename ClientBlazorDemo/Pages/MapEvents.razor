@@ -60,7 +60,7 @@
 
         await map1.InteropObject.AddListener("maptypeid_changed", OnMapTypeIdChanged);
 
-        await map1.InteropObject.AddListener<MouseEvent>("mousemove", OnMouseMove);
+        await map1.InteropObject.AddListener<MouseEvent>("mousemove", async (e) => await OnMouseMove(e));
 
         await map1.InteropObject.AddListener("mouseout", OnMouseOut);
 
@@ -101,7 +101,7 @@
     {
         //Console.WriteLine("Click.");
 
-        _events.Insert(0, $"Click {e.LatLng}.");
+        _events.Insert(0, $"Click {await e.LatLng}.");
         _events = _events.Take(100).ToList();
 
         StateHasChanged();
@@ -181,11 +181,11 @@
         StateHasChanged();
     }
 
-    private void OnMouseMove(MouseEvent e)
+    private async Task OnMouseMove(MouseEvent e)
     {
         //Console.WriteLine("OnMouseMove.");
 
-        _events.Insert(0, $"OnMouseMove {e.LatLng}.");
+        _events.Insert(0, $"OnMouseMove {await e.LatLng}.");
         _events = _events.Take(100).ToList();
 
         StateHasChanged();

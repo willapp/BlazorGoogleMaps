@@ -1,0 +1,40 @@
+﻿@page "/mapData"
+@using GoogleMapsComponents
+@using GoogleMapsComponents.Maps
+@using System.Diagnostics
+
+<h1>Google Map Data</h1>
+
+<GoogleMap @ref="@map1" Id="map1" Options="@mapOptions"></GoogleMap>
+<button @onclick="@Load">Load</button>
+@*<button @onclick="@RemoveMarker">Remove marker</button>
+<button @onclick="@Recenter">Re-center marker</button>*@
+
+@functions {
+    private GoogleMap map1;
+
+    private MapOptions mapOptions;
+
+    protected override void OnInit()
+    {
+        mapOptions = new MapOptions()
+        {
+            Zoom = 13,
+            Center = new LatLngLiteral()
+            {
+                Lat = 13.505892,
+                Lng = 100.8162
+            },
+            MapTypeId = MapTypeId.Roadmap
+        };
+    }
+
+    private async Task Load()
+    {
+        await map1.InteropObject.Data.LoadGeoJson(
+            "https://storage.googleapis.com/mapsdevsite/json/google.json",
+            callback: features => Debug.WriteLine($"Feature length : {features.Length}")
+            );
+    }
+
+}

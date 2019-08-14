@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using OneOf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -191,7 +192,7 @@ namespace GoogleMapsComponents
             return guids.Select(guid => new JsObjectRef(_jsRuntime, new Guid(guid))).ToArray();
         }
 
-        public Task<T> GetValue<T>(string propertyName)
+        public Task<T> GetPropertyValue<T>(string propertyName)
         {
             return _jsRuntime.MyInvokeAsync<T>(
                 "googleMapsObjectManager.readObjectPropertyValue",
@@ -199,7 +200,7 @@ namespace GoogleMapsComponents
                  propertyName);
         }
 
-        public async Task<JsObjectRef> GetObjectReference(string propertyName)
+        public async Task<JsObjectRef> GetPropertyObjectByReference(string propertyName)
         {
             var guid = await _jsRuntime.MyInvokeAsync<string>(
                 "googleMapsObjectManager.readObjectPropertyValueWithReturnedObjectRef",
@@ -207,6 +208,23 @@ namespace GoogleMapsComponents
                  propertyName);
 
             return new JsObjectRef(_jsRuntime, new Guid(guid));
+        }
+
+        public async Task<T> GetPropertyObjectByReference<T>(string propertyName, Func<JsObjectRef, T> constructor)
+        {
+            return constructor(await GetPropertyObjectByReference(propertyName));
+        }
+
+        public async Task<T> GetPropertyObjectByJson<T>(string propertyName)
+        {
+            var json = await _jsRuntime.MyInvokeAsync<string>(
+                "googleMapsObjectManager.readObjectPropertyValueWithReturedJson",
+                 _guid.ToString(),
+                 propertyName);
+
+            Debug.WriteLine(json);
+
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         public override bool Equals(object obj)
@@ -224,6 +242,137 @@ namespace GoogleMapsComponents
         public override int GetHashCode()
         {
             return _guid.GetHashCode();
+        }
+    }
+
+    public class JsObjectRefBase : IDisposable
+    {
+        private readonly JsObjectRef _jsObjectRef;
+
+        public JsObjectRefBase(JsObjectRef jsObjectRef)
+        {
+            _jsObjectRef = jsObjectRef;
+        }
+
+        public static Task<JsObjectRef> CreateAsync(
+            IJSRuntime jsRuntime,
+            string constructorFunctionName,
+            params object[] args)
+        {
+            return CreateAsync(jsRuntime, Guid.NewGuid(), constructorFunctionName, args);
+        }
+
+        public async static Task<JsObjectRef> CreateAsync(
+            IJSRuntime jsRuntime,
+            Guid guid,
+            string functionName,
+            params object[] args)
+        {
+            var jsObjectRef = new JsObjectRef(jsRuntime, guid);
+
+            await jsRuntime.MyInvokeAsync<object>(
+                "googleMapsObjectManager.createObject",
+                new object[] { guid.ToString(), functionName }
+                    .Concat(args).ToArray()
+            );
+
+            return jsObjectRef;
+        }
+
+        public virtual void Dispose()
+        {
+            DisposeAsync();
+        }
+
+        public Task DisposeAsync()
+        {
+            return _jsObjectRef.DisposeAsync();
+        }
+
+        public Task InvokeAsync(string functionName, params object[] args)
+        {
+            return _jsObjectRef.InvokeAsync(functionName, args);
+        }
+
+        public Task<T> InvokeAsync<T>(string functionName, params object[] args)
+        {
+            return _jsObjectRef.InvokeAsync<T>(functionName, args);
+        }
+
+        /// <summary>
+        /// Use when returned result will be one of defined types
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="jsRuntime"></param>
+        /// <param name="identifier"></param>
+        /// <param name="args"></param>
+        /// <returns>Discriminated union of specified types</returns>
+        public Task<OneOf<T, U>> InvokeAsync<T, U>(string functionName, params object[] args)
+        {
+            return _jsObjectRef.InvokeAsync<T, U>(functionName, args);
+        }
+
+        /// <summary>
+        /// Use when returned result will be one of defined types
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <typeparam name="V"></typeparam>
+        /// <param name="jsRuntime"></param>
+        /// <param name="identifier"></param>
+        /// <param name="args"></param>
+        /// <returns>Discriminated union of specified types</returns>
+        public Task<OneOf<T, U, V>> InvokeAsync<T, U, V>(string functionName, params object[] args)
+        {
+            return _jsObjectRef.InvokeAsync<T, U, V>(functionName, args);
+        }
+
+        public Task<JsObjectRef> InvokeWithReturnedObjectRefAsync(string functionName, params object[] args)
+        {
+            return _jsObjectRef.InvokeWithReturnedObjectRefAsync(functionName, args);
+        }
+
+        public Task<JsObjectRef[]> InvokeWithReturnedObjectRefArrayAsync(string functionName, params object[] args)
+        {
+            return _jsObjectRef.InvokeWithReturnedObjectRefArrayAsync(functionName, args);
+        }
+
+        public Task<T> GetValue<T>(string propertyName)
+        {
+            return _jsObjectRef.GetPropertyValue<T>(propertyName);
+        }
+
+        public Task<JsObjectRef> GetObjectReference(string propertyName)
+        {
+            return _jsObjectRef.GetPropertyObjectByReference(propertyName);
+        }
+
+        public Task<T> GetObject<T>(string propertyName, Func<JsObjectRef, T> constructor)
+        {
+            return _jsObjectRef.GetPropertyObjectByReference<T>(propertyName, constructor);
+        }
+
+        public Task<T> GetJson<T>(string propertyName)
+        {
+            return _jsObjectRef.GetPropertyObjectByJson<T>(propertyName);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is JsObjectRefBase other)
+            {
+                return _jsObjectRef.Equals(other._jsObjectRef);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return _jsObjectRef.GetHashCode();
         }
     }
 }

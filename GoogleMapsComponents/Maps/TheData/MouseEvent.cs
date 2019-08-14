@@ -12,6 +12,17 @@ namespace GoogleMapsComponents.Maps.TheData
     /// </summary>
     public class MouseEvent : Maps.MouseEvent
     {
-        public Feature Feature { get; set; }
+        public MouseEvent(JsObjectRef jsObjectRef)
+            : base(jsObjectRef)
+        {
+        }
+
+        public Task<Feature> Feature
+        {
+            get
+            {
+                return GetObject("feature", objRef => new Feature(objRef));
+            }
+        }
     }
 }

@@ -21,7 +21,6 @@ namespace GoogleMapsComponents.Maps
         public async static Task<Circle> CreateAsync(IJSRuntime jsRuntime, CircleOptions opts = null)
         {
             var jsObjectRef = await JsObjectRef.CreateAsync(jsRuntime, "google.maps.Circle", opts);
-
             var obj = new Circle(jsObjectRef, opts);
 
             return obj;

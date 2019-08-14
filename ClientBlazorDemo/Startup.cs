@@ -8,7 +8,7 @@ namespace ClientBlazorDemo
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddBlazorGoogleMaps();
+            //services.AddBlazorGoogleMaps();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

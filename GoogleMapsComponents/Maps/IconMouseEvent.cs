@@ -14,9 +14,9 @@ namespace GoogleMapsComponents.Maps
     {
         public string PlaceId { get; set; }
 
-        public IconMouseEvent()
+        public IconMouseEvent(JsObjectRef jsObjectRef)
+            : base(jsObjectRef)
         {
-
         }
     }
 }
