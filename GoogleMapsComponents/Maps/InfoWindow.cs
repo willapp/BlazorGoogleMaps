@@ -9,7 +9,7 @@ namespace GoogleMapsComponents.Maps
     /// <summary>
     /// An overlay that looks like a bubble and is often connected to a marker.
     /// </summary>
-    public class InfoWindow : JsObjectRefBase
+    public class InfoWindow : GoogleMapObjectRef
     {
         /// <summary>
         /// Creates an info window with the given options. 
@@ -39,11 +39,6 @@ namespace GoogleMapsComponents.Maps
             : base(jsObjectRef)
         {
         }
-
-        //public void Dispose()
-        //{
-        //    _jsObjectRef.Dispose();
-        //}
 
         /// <summary>
         /// Closes this InfoWindow by removing it from the DOM structure.

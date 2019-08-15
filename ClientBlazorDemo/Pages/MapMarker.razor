@@ -5,7 +5,7 @@
 
 <h1>Google Map Markers</h1>
 
-<GoogleMap @ref="@map1" Id="map1" Options="@mapOptions"></GoogleMap>
+<GoogleMap @ref="@map1" @ref:suppressField Id="map1" Options="@mapOptions"></GoogleMap>
 <button @onclick="@AddMarker">Add marker</button>
 <button @onclick="@RemoveMarker">Remove marker</button>
 <button @onclick="@Recenter">Re-center marker</button>
@@ -21,9 +21,9 @@
 
     private List<String> _events = new List<String>();
 
-    private MapEventList eventList;
+    //private MapEventList eventList;
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
         mapOptions = new MapOptions()
         {

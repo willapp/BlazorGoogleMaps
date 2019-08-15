@@ -76,7 +76,7 @@ namespace GoogleMapsComponents.Maps
             var jsObjectRef = await _jsObjectRef.InvokeWithReturnedObjectRefAsync(
                 "getMap");
 
-            return JsObjectRefInstances.GetInstance<Map>(jsObjectRef.Guid.ToString());
+            return GoogleMapObjectRefInstances.GetInstance<Map>(jsObjectRef.Guid.ToString());
         }
 
         public Task<LatLngLiteral> GetPosition()

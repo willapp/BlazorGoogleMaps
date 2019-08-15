@@ -5,7 +5,7 @@
 
 <h1>Google Map Data</h1>
 
-<GoogleMap @ref="@map1" Id="map1" Options="@mapOptions"></GoogleMap>
+<GoogleMap @ref="@map1" @ref:suppressField Id="map1" Options="@mapOptions"></GoogleMap>
 <button @onclick="@Load">Load</button>
 @*<button @onclick="@RemoveMarker">Remove marker</button>
 <button @onclick="@Recenter">Re-center marker</button>*@
@@ -15,7 +15,7 @@
 
     private MapOptions mapOptions;
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
         mapOptions = new MapOptions()
         {
@@ -31,7 +31,8 @@
 
     private async Task Load()
     {
-        await map1.InteropObject.Data.LoadGeoJson(
+        var data = await map1.InteropObject.Data;
+        await data.LoadGeoJson(
             "https://storage.googleapis.com/mapsdevsite/json/google.json",
             callback: features => Debug.WriteLine($"Feature length : {features.Length}")
             );

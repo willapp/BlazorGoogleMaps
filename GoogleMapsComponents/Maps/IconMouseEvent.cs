@@ -12,7 +12,10 @@ namespace GoogleMapsComponents.Maps
     /// </summary>
     public class IconMouseEvent : MouseEvent
     {
-        public string PlaceId { get; set; }
+        public Task<string> PlaceId 
+        { 
+            get { return GetValue<string>("placeId"); }
+        }
 
         public IconMouseEvent(JsObjectRef jsObjectRef)
             : base(jsObjectRef)

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GoogleMapsComponents
 {
-    internal static class JsObjectRefInstances
+    internal static class GoogleMapObjectRefInstances
     {
         private static Dictionary<string, IJsObjectRef> _instances = new Dictionary<string, IJsObjectRef>();
 

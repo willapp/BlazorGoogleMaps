@@ -9,7 +9,7 @@ namespace GoogleMapsComponents.Maps
     /// <summary>
     /// This object is returned from various mouse events on the map and overlays.
     /// </summary>
-    public class MouseEvent : JsObjectRefBase
+    public class MouseEvent : GoogleMapObjectRef
     {
         public MouseEvent(JsObjectRef jsObjectRef)
             : base(jsObjectRef)
@@ -28,9 +28,9 @@ namespace GoogleMapsComponents.Maps
         /// <summary>
         /// Prevents this event from propagating further.
         /// </summary>
-        public Task Stop()
+        public void Stop()
         {
-            return InvokeAsync("stop");
+            _ = InvokeAsync("stop");
         }
     }
 }

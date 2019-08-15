@@ -15,7 +15,7 @@ namespace GoogleMapsComponents.Maps
     /// Every Map has a Data object by default, so most of the time there is no need to construct one.
     /// The Data object is a collection of Features.
     /// </summary>
-    public class Data : JsObjectRefBase
+    public class Data : GoogleMapObjectRef
     {
         //private Map _map;
 

@@ -6,19 +6,19 @@
 
 @implements IDisposable
 
-<div @ref="@Element" id="@Id" style="height: 500px"></div>
+<div @ref="@Element" @ref:suppressField id="@Id" style="height: 500px"></div>
 
 @functions {
     [Parameter]
-    private string Id { get; set; }
+    public string Id { get; set; }
 
     [Parameter]
-    private MapOptions Options { get; set; }
+    public MapOptions Options { get; set; }
 
     [Parameter]
-    private Action OnAfterInit { get; set; }
+    public Action OnAfterInit { get; set; }
 
-    private ElementRef Element { get; set; }
+    private ElementReference Element { get; set; }
 
     protected override async Task OnAfterRenderAsync()
     {

@@ -222,7 +222,7 @@ namespace GoogleMapsComponents
                  _guid.ToString(),
                  propertyName);
 
-            Debug.WriteLine(json);
+            //Debug.WriteLine($"{nameof(GetPropertyObjectByJson)} {json}");
 
             return JsonConvert.DeserializeObject<T>(json);
         }
@@ -245,11 +245,13 @@ namespace GoogleMapsComponents
         }
     }
 
-    public class JsObjectRefBase : IDisposable
+    public class GoogleMapObjectRef : IDisposable, IJsObjectRef
     {
         private readonly JsObjectRef _jsObjectRef;
 
-        public JsObjectRefBase(JsObjectRef jsObjectRef)
+        public Guid Guid => _jsObjectRef.Guid;
+
+        public GoogleMapObjectRef(JsObjectRef jsObjectRef)
         {
             _jsObjectRef = jsObjectRef;
         }
@@ -284,17 +286,17 @@ namespace GoogleMapsComponents
             DisposeAsync();
         }
 
-        public Task DisposeAsync()
+        internal Task DisposeAsync()
         {
             return _jsObjectRef.DisposeAsync();
         }
 
-        public Task InvokeAsync(string functionName, params object[] args)
+        internal Task InvokeAsync(string functionName, params object[] args)
         {
             return _jsObjectRef.InvokeAsync(functionName, args);
         }
 
-        public Task<T> InvokeAsync<T>(string functionName, params object[] args)
+        internal Task<T> InvokeAsync<T>(string functionName, params object[] args)
         {
             return _jsObjectRef.InvokeAsync<T>(functionName, args);
         }
@@ -308,7 +310,7 @@ namespace GoogleMapsComponents
         /// <param name="identifier"></param>
         /// <param name="args"></param>
         /// <returns>Discriminated union of specified types</returns>
-        public Task<OneOf<T, U>> InvokeAsync<T, U>(string functionName, params object[] args)
+        internal Task<OneOf<T, U>> InvokeAsync<T, U>(string functionName, params object[] args)
         {
             return _jsObjectRef.InvokeAsync<T, U>(functionName, args);
         }
@@ -323,44 +325,44 @@ namespace GoogleMapsComponents
         /// <param name="identifier"></param>
         /// <param name="args"></param>
         /// <returns>Discriminated union of specified types</returns>
-        public Task<OneOf<T, U, V>> InvokeAsync<T, U, V>(string functionName, params object[] args)
+        internal Task<OneOf<T, U, V>> InvokeAsync<T, U, V>(string functionName, params object[] args)
         {
             return _jsObjectRef.InvokeAsync<T, U, V>(functionName, args);
         }
 
-        public Task<JsObjectRef> InvokeWithReturnedObjectRefAsync(string functionName, params object[] args)
+        internal Task<JsObjectRef> InvokeWithReturnedObjectRefAsync(string functionName, params object[] args)
         {
             return _jsObjectRef.InvokeWithReturnedObjectRefAsync(functionName, args);
         }
 
-        public Task<JsObjectRef[]> InvokeWithReturnedObjectRefArrayAsync(string functionName, params object[] args)
+        internal Task<JsObjectRef[]> InvokeWithReturnedObjectRefArrayAsync(string functionName, params object[] args)
         {
             return _jsObjectRef.InvokeWithReturnedObjectRefArrayAsync(functionName, args);
         }
 
-        public Task<T> GetValue<T>(string propertyName)
+        internal Task<T> GetValue<T>(string propertyName)
         {
             return _jsObjectRef.GetPropertyValue<T>(propertyName);
         }
 
-        public Task<JsObjectRef> GetObjectReference(string propertyName)
+        internal Task<JsObjectRef> GetObjectReference(string propertyName)
         {
             return _jsObjectRef.GetPropertyObjectByReference(propertyName);
         }
 
-        public Task<T> GetObject<T>(string propertyName, Func<JsObjectRef, T> constructor)
+        internal Task<T> GetObject<T>(string propertyName, Func<JsObjectRef, T> constructor)
         {
             return _jsObjectRef.GetPropertyObjectByReference<T>(propertyName, constructor);
         }
 
-        public Task<T> GetJson<T>(string propertyName)
+        internal Task<T> GetJson<T>(string propertyName)
         {
             return _jsObjectRef.GetPropertyObjectByJson<T>(propertyName);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is JsObjectRefBase other)
+            if (obj is GoogleMapObjectRef other)
             {
                 return _jsObjectRef.Equals(other._jsObjectRef);
             }

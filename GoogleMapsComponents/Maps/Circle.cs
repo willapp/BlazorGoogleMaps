@@ -9,11 +9,8 @@ namespace GoogleMapsComponents.Maps
     /// <summary>
     /// A circle on the Earth's surface; also known as a "spherical cap".
     /// </summary>
-    public class Circle : IDisposable
+    public class Circle : GoogleMapObjectRef
     {
-        private Map _map;
-        private readonly JsObjectRef _jsObjectRef;
-
         /// <summary>
         /// Create a circle using the passed CircleOptions, which specify the center, radius, and style.
         /// </summary>
@@ -21,24 +18,14 @@ namespace GoogleMapsComponents.Maps
         public async static Task<Circle> CreateAsync(IJSRuntime jsRuntime, CircleOptions opts = null)
         {
             var jsObjectRef = await JsObjectRef.CreateAsync(jsRuntime, "google.maps.Circle", opts);
-            var obj = new Circle(jsObjectRef, opts);
+            var obj = new Circle(jsObjectRef);
 
             return obj;
         }
 
-        private Circle(JsObjectRef jsObjectRef, CircleOptions opts = null)
+        private Circle(JsObjectRef jsObjectRef)
+            : base(jsObjectRef)
         {
-            _jsObjectRef = jsObjectRef;
-
-            if (opts != null)
-            {
-                _map = opts.Map;
-            }
-        }
-
-        public void Dispose()
-        {
-            _jsObjectRef.Dispose();
         }
 
         /// <summary>
@@ -47,7 +34,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<LatLngBoundsLiteral> GetBounds()
         {
-            return _jsObjectRef.InvokeAsync<LatLngBoundsLiteral>("getBounds");
+            return InvokeAsync<LatLngBoundsLiteral>("getBounds");
         }
 
         /// <summary>
@@ -56,7 +43,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<LatLngLiteral> GetCenter()
         {
-            return _jsObjectRef.InvokeAsync<LatLngLiteral>("getCenter");
+            return InvokeAsync<LatLngLiteral>("getCenter");
         }
 
         /// <summary>
@@ -65,7 +52,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<bool> GetDraggable()
         {
-            return _jsObjectRef.InvokeAsync<bool>("getDraggable");
+            return InvokeAsync<bool>("getDraggable");
         }
 
         /// <summary>
@@ -74,16 +61,16 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<bool> GetEditable()
         {
-            return _jsObjectRef.InvokeAsync<bool>("getEditable");
+            return InvokeAsync<bool>("getEditable");
         }
 
         /// <summary>
         /// Returns the map on which this circle is displayed.
         /// </summary>
         /// <returns></returns>
-        public Map GetMap()
+        public Task<Map> GetMap()
         {
-            return _map;
+            return InvokeAsync<Map>("getMap");
         }
 
         /// <summary>
@@ -92,7 +79,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<double> GetRadius()
         {
-            return _jsObjectRef.InvokeAsync<double>("getRadius");
+            return InvokeAsync<double>("getRadius");
         }
 
         /// <summary>
@@ -101,7 +88,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<bool> GetVisible()
         {
-            return _jsObjectRef.InvokeAsync<bool>("getVisible");
+            return InvokeAsync<bool>("getVisible");
         }
 
         /// <summary>
@@ -110,7 +97,7 @@ namespace GoogleMapsComponents.Maps
         /// <param name="center"></param>
         public Task SetCenter(LatLngLiteral center)
         {
-            return _jsObjectRef.InvokeAsync("setCenter", center);
+            return InvokeAsync("setCenter", center);
         }
 
         /// <summary>
@@ -119,7 +106,7 @@ namespace GoogleMapsComponents.Maps
         /// <param name="draggable"></param>
         public Task SetDraggable(bool draggable)
         {
-            return _jsObjectRef.InvokeAsync("setDraggable", draggable);
+            return InvokeAsync("setDraggable", draggable);
         }
 
         /// <summary>
@@ -128,7 +115,7 @@ namespace GoogleMapsComponents.Maps
         /// <param name="editable"></param>
         public Task SetEditable(bool editable)
         {
-            return _jsObjectRef.InvokeAsync("setEditable", editable);
+            return InvokeAsync("setEditable", editable);
         }
 
         /// <summary>
@@ -137,16 +124,14 @@ namespace GoogleMapsComponents.Maps
         /// <param name="map"></param>
         public Task SetMap(Map map)
         {
-            _map = map;
-
-            return _jsObjectRef.InvokeAsync(
+            return InvokeAsync(
                 "setMap",
                 map);
         }
 
         public Task SetOptions(CircleOptions options)
         {
-            return _jsObjectRef.InvokeAsync("setOptions", options);
+            return InvokeAsync("setOptions", options);
         }
 
         /// <summary>
@@ -155,7 +140,7 @@ namespace GoogleMapsComponents.Maps
         /// <param name="radius"></param>
         public Task SetRadius(double radius)
         {
-            return _jsObjectRef.InvokeAsync("setRadius", radius);
+            return InvokeAsync("setRadius", radius);
         }
 
         /// <summary>
@@ -164,7 +149,7 @@ namespace GoogleMapsComponents.Maps
         /// <param name="visible"></param>
         public Task SetVisible(bool visible)
         {
-            return _jsObjectRef.InvokeAsync("setVisible", visible);
+            return InvokeAsync("setVisible", visible);
         }
     }
 }

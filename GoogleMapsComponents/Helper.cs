@@ -54,7 +54,7 @@ namespace GoogleMapsComponents
 
                     var argType = arg.GetType();
 
-                    if (arg is ElementRef
+                    if (arg is ElementReference
                         || arg is string
                         || arg is int
                         || arg is long
