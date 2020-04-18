@@ -80,8 +80,7 @@ namespace GoogleMapsComponents.Maps
         /// <returns></returns>
         public Task<IEnumerable<LatLngLiteral>> GetPath()
         {
-            return _jsObjectRef.InvokeAsync<IEnumerable<LatLngLiteral>>(
-                "getPath");
+            return _jsObjectRef.InvokeAsync<IEnumerable<LatLngLiteral>>("getPath");
         }
 
         /// <summary>
@@ -163,6 +162,22 @@ namespace GoogleMapsComponents.Maps
             return _jsObjectRef.InvokeAsync(
                 "setVisible",
                 visible);
+        }
+
+        public async Task<MapEventListener> AddListener(string eventName, Action handler)
+        {
+            var listenerRef = await _jsObjectRef.InvokeWithReturnedObjectRefAsync(
+                "addListener", eventName, handler);
+
+            return new MapEventListener(listenerRef);
+        }
+
+        public async Task<MapEventListener> AddListener<T>(string eventName, Action<T> handler)
+        {
+            var listenerRef = await _jsObjectRef.InvokeWithReturnedObjectRefAsync(
+                "addListener", eventName, handler);
+
+            return new MapEventListener(listenerRef);
         }
     }
 }
